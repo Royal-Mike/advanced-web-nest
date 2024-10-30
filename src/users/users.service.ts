@@ -21,4 +21,17 @@ export class UsersService {
   async findOne(username: string): Promise<User | undefined> {
     return this.users.find((user) => user.username === username);
   }
+
+  async createUser(
+    username: string,
+    password: string,
+  ): Promise<User | undefined> {
+    const existingUser = await this.findOne(username);
+    if (existingUser) {
+      throw new Error('Username already exists');
+    }
+    const newUser = { userId: Date.now(), username, password };
+    this.users.push(newUser);
+    return newUser;
+  }
 }
