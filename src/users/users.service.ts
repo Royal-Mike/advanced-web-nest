@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import bcrypt, { compare, hash } from 'bcrypt';
+const saltRounds = 10;
 
 // This should be a real class/interface representing a user entity
 export type User = {
@@ -32,6 +34,11 @@ export class UsersService {
     return this.users.find((user) => user.email === email);
   }
 
+  async comparePasswords(password: string, hash: string): Promise<boolean> {
+    const check = await compare(password, hash);
+    return check;
+  }
+
   async createUser(
     username: string,
     email: string,
@@ -41,11 +48,14 @@ export class UsersService {
     if (existingUser) {
       throw new Error('Username already exists');
     }
+
     const existingEmail = await this.findByEmail(email);
     if (existingEmail) {
       throw new Error('Email already exists');
     }
-    const newUser = { userId: Date.now(), username, password, email };
+
+    const hashed = await hash(password, saltRounds);
+    const newUser = { userId: Date.now(), username, password: hashed, email };
     this.users.push(newUser);
     return newUser;
   }

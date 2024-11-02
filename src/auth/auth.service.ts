@@ -9,21 +9,25 @@ import { User, UsersService } from '../users/users.service';
 export class AuthService {
   constructor(private usersService: UsersService) {}
 
-  async signIn(username: string, pass: string): Promise<string> {
+  async signIn(username: string, password: string): Promise<string> {
     const user = await this.usersService.findByUsername(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+    if (!user) {
+      throw new UnauthorizedException("Username doesn't exist");
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
+  
+    const checkPassword = await this.usersService.comparePasswords(password, user.password);
+    if (!checkPassword) {
+      throw new UnauthorizedException("Wrong passsword");
+    }
+
     // TODO: Generate a JWT and return it here
     // instead of the user object
     return "true";
   }
 
-  async register(username: string, email: string, pass: string): Promise<User> {
+  async register(username: string, email: string, password: string): Promise<User> {
     try {
-      const user = await this.usersService.createUser(username, email, pass);
+      const user = await this.usersService.createUser(username, email, password);
       return user;
     } catch (e) {
       throw new ConflictException(e.message);
