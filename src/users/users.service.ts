@@ -1,38 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import bcrypt, { compare, hash } from 'bcrypt';
-const saltRounds = 10;
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
 
-// This should be a real class/interface representing a user entity
-export type User = {
-  userId: number,
-  username: string,
-  password: string,
-  email: string
-};
+import { compare, hash } from 'bcrypt';
+const saltRounds = 10;
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-      email: 'a@gmail.com'
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-      email: 'b@gmail.com'
-    },
-  ];
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async create(createCatDto: CreateUserDto): Promise<User> {
+    const createdCat = new this.userModel(createCatDto);
+    return createdCat.save();
   }
 
-  async findByEmail(email: string): Promise<User | undefined> {
-    return this.users.find((user) => user.email === email);
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return this.userModel.findOne({ username }).exec();
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).exec();
   }
 
   async comparePasswords(password: string, hash: string): Promise<boolean> {
@@ -56,8 +49,9 @@ export class UsersService {
     }
 
     const hashed = await hash(password, saltRounds);
-    const newUser = { userId: Date.now(), username, password: hashed, email };
-    this.users.push(newUser);
+    const newUser = { userId: Date.now(), username, password: hashed, email, createdAt: new Date() };
+    this.create(newUser);
+
     return newUser;
   }
 }

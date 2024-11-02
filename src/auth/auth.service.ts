@@ -4,7 +4,8 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User, UsersService } from '../users/users.service';
+import { User } from '../users/schemas/user.schema';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException("Username doesn't exist");
     }
-  
+
     const checkPassword = await this.usersService.comparePasswords(password, user.password);
     if (!checkPassword) {
       throw new UnauthorizedException("Wrong passsword");
