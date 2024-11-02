@@ -27,7 +27,7 @@ export class AuthService {
 
     const checkPassword = await this.usersService.comparePasswords(password, user.password);
     if (!checkPassword) {
-      throw new UnauthorizedException("Wrong passsword");
+      throw new UnauthorizedException("Wrong password");
     }
 
     const payload = { sub: user.userId, username: user.username };
