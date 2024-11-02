@@ -36,14 +36,27 @@ export class AuthService {
     };
   }
 
-  async register(username: string, email: string, password: string): Promise<User> {
+  async register(username: string, email: string, password: string): Promise<{username: string}> {
     if (!username || !email || !password) {
       throw new BadRequestException("Invalid data");
     }
 
+    if (password.length < 8) {
+      throw new BadRequestException("Password must have at least 8 characters");
+    }
+    if (password.search(/[a-z]/i) < 0) {
+      throw new BadRequestException("Password must contain at least one letter");
+    }
+    if (password.search(/[0-9]/) < 0) {
+      throw new BadRequestException("Password must contain at least one digit");
+    }
+    if (email.search(/\S+@\S+/) < 0) {
+      throw new BadRequestException("Invalid email");
+    }
+
     try {
-      const user = await this.usersService.createUser(username, email, password);
-      return user;
+      const name = await this.usersService.createUser(username, email, password);
+      return { username: name };
     } catch (e) {
       throw new ConflictException(e.message);
     }

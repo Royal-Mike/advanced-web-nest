@@ -37,7 +37,7 @@ export class UsersService {
     username: string,
     email: string,
     password: string,
-  ): Promise<User | undefined> {
+  ): Promise<string> {
     const existingUser = await this.findByUsername(username);
     if (existingUser) {
       throw new Error('Username already exists');
@@ -52,6 +52,6 @@ export class UsersService {
     const newUser = { userId: Date.now(), username, password: hashed, email, createdAt: new Date() };
     this.create(newUser);
 
-    return newUser;
+    return username;
   }
 }
