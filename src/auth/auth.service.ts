@@ -5,12 +5,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { User, UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
 
-  async signIn(username: string, password: string): Promise<string> {
+  async signIn(username: string, password: string): Promise<{ access_token: string }> {
     if (!username || !password) {
       throw new BadRequestException("Invalid data");
     }
@@ -25,9 +29,10 @@ export class AuthService {
       throw new UnauthorizedException("Wrong passsword");
     }
 
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-    return "true";
+    const payload = { sub: user.userId, username: user.username };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async register(username: string, email: string, password: string): Promise<User> {
