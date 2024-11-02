@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -10,6 +11,10 @@ export class AuthService {
   constructor(private usersService: UsersService) {}
 
   async signIn(username: string, password: string): Promise<string> {
+    if (!username || !password) {
+      throw new BadRequestException("Invalid data");
+    }
+
     const user = await this.usersService.findByUsername(username);
     if (!user) {
       throw new UnauthorizedException("Username doesn't exist");
@@ -26,6 +31,10 @@ export class AuthService {
   }
 
   async register(username: string, email: string, password: string): Promise<User> {
+    if (!username || !email || !password) {
+      throw new BadRequestException("Invalid data");
+    }
+
     try {
       const user = await this.usersService.createUser(username, email, password);
       return user;
