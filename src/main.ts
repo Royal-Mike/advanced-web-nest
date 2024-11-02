@@ -5,7 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: [
-      'http://localhost:5173//advanced-web-dev/user-registration/login',
+      'http://localhost:5173/advanced-web-dev/user-registration/login',
       'https://royal-mike.github.io/advanced-web-dev/user-registration/login'
     ],
     credentials: true
