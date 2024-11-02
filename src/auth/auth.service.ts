@@ -9,8 +9,8 @@ import { User, UsersService } from '../users/users.service';
 export class AuthService {
   constructor(private usersService: UsersService) {}
 
-  async signIn(username: string, pass: string): Promise<User> {
-    const user = await this.usersService.findOne(username);
+  async signIn(username: string, pass: string): Promise<string> {
+    const user = await this.usersService.findByUsername(username);
     if (user?.password !== pass) {
       throw new UnauthorizedException();
     }
@@ -18,12 +18,12 @@ export class AuthService {
     const { password, ...result } = user;
     // TODO: Generate a JWT and return it here
     // instead of the user object
-    return result;
+    return "true";
   }
 
-  async register(username: string, pass: string): Promise<User> {
+  async register(username: string, email: string, pass: string): Promise<User> {
     try {
-      const user = await this.usersService.createUser(username, pass);
+      const user = await this.usersService.createUser(username, email, pass);
       return user;
     } catch (e) {
       throw new ConflictException(e.message);
