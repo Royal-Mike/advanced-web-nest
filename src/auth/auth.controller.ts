@@ -42,6 +42,19 @@ export class AuthController {
     );
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(@Res({passthrough: true}) res: Response) {
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    return {
+      message: 'Logout successful'
+    }
+  }
+
   @UseGuards(AuthGuard)
   @Get('home')
   getProfile(@Request() req: any) {
