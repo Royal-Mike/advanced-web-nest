@@ -19,9 +19,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(
-    @Body() signInDto: Record<string, any>, @Res({passthrough: true}) res: Response):
-    Promise<{access_token: string, username: string, email: string, createdAt: Date}> {
+  async signIn(@Body() signInDto: Record<string, any>, @Res({passthrough: true}) res: Response):
+  Promise<{access_token: string, username: string, email: string, createdAt: Date}> {
     const result = await this.authService.signIn(signInDto.username, signInDto.password);
     // res.cookie('accessToken', tokens.access_token, {
     //   httpOnly: true,
