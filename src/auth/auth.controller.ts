@@ -19,17 +19,17 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() signInDto: Record<string, any>, @Res({passthrough: true}) res: Response): Promise<{message: string}> {
-    const tokens = await this.authService.signIn(signInDto.username, signInDto.password);
-    res.cookie('accessToken', tokens.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-    });
-    return {
-      message: 'Login successful'
-    }
+  async signIn(
+    @Body() signInDto: Record<string, any>, @Res({passthrough: true}) res: Response):
+    Promise<{access_token: string, username: string, email: string, createdAt: Date}> {
+    const result = await this.authService.signIn(signInDto.username, signInDto.password);
+    // res.cookie('accessToken', tokens.access_token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   maxAge: 15 * 60 * 1000, // 15 minutes
+    //   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    // });
+    return result;
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -45,18 +45,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   async logout(@Res({passthrough: true}) res: Response) {
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-    });
+    // res.clearCookie('accessToken', {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    // });
     return {
       message: 'Logout successful'
     }
   }
 
   @UseGuards(AuthGuard)
-  @Get('home')
+  @Get('profile')
   getProfile(@Request() req: any) {
     return req.user;
   }

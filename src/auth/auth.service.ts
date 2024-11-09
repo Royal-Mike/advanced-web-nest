@@ -15,8 +15,8 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signIn(username: string, password: string): Promise<{ access_token: string }> {
-    if (!username || !password) {
+  async signIn(username: string, pass: string): Promise<{ access_token: string, username: string, email: string, createdAt: Date }> {
+    if (!username || !pass) {
       throw new BadRequestException("Invalid data");
     }
 
@@ -25,13 +25,16 @@ export class AuthService {
       throw new UnauthorizedException("Username doesn't exist");
     }
 
-    const checkPassword = await this.usersService.comparePasswords(password, user.password);
+    const checkPassword = await this.usersService.comparePasswords(pass, user.password);
     if (!checkPassword) {
       throw new UnauthorizedException("Wrong password");
     }
 
     const payload = { sub: user.userId, username: user.username };
     return {
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
