@@ -30,7 +30,7 @@ export class AuthService {
       throw new UnauthorizedException("Wrong password");
     }
 
-    const payload = { sub: user.userId, username: user.username };
+    const payload = { sub: user.userId, username: user.username, email: user.email };
     return {
       username: user.username,
       email: user.email,
