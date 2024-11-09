@@ -56,14 +56,6 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('home')
-  getHome(@Request() req: any) {
-    return {
-      success: true
-    }
-  }
-
-  @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req: any) {
     return req.user;
